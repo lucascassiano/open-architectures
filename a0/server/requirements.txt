@@ -1,0 +1,9 @@
+flask
+pymongo
+bcrypt
+dynaconf
+urlparse
+#data
+pandas
+numpy
+

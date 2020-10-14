@@ -1,0 +1,3 @@
+[server]
+baseUrlPath = "/streamlit"
+enableCORS = false

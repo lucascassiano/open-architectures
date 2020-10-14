@@ -4,8 +4,8 @@ import pandas as pd
 import numpy as np
 
 params = st.experimental_get_query_params()
-api_key = str(params["apikey"][0])
-st.write(f'api_key --> {api_key}')
+# api_key = str(params["apikey"])
+# st.write(f'api_key --> {api_key}')
 
 st.title('Hello from Streamlit')
 st.title('Uber pickups in NYC')

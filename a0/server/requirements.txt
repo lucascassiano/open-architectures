@@ -3,7 +3,10 @@ pymongo
 bcrypt
 dynaconf
 urlparse
+
 #data
 pandas
 numpy
 
+#server
+websockets

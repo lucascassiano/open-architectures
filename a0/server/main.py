@@ -1,10 +1,14 @@
 from flask import Flask, render_template, url_for, request, session, redirect, Response
+# from flask_reverse_proxy_fix.middleware import ReverseProxyPrefixFix
+
 from pymongo import MongoClient
 from urllib.parse import urljoin
 import bcrypt
 import requests
 
-app = Flask(__name__,  static_url_path="/STATIC_FOLDER")
+app = Flask(__name__)  # ,  static_url_path="/STATIC_FOLDER")
+# app.config['REVERSE_PROXY_PATH'] = '/streamlit'
+# ReverseProxyPrefixFix(app)
 
 MONGO_USER = "root"
 MONGO_PASSWORD = "password"
@@ -17,7 +21,7 @@ APP_SECRET = "mainSecret"
 
 @app.route('/')
 def index():
-    if not session['username']:
+    if not session or not session['username']:
         return render_template('index.html')
 
     if 'username' in session:
@@ -81,18 +85,53 @@ def dataApp():
     return 'data app'
 
 
-# @app.route('/streamlit', methods=['GET'])
-# def proxy():
-#     if request.method == 'GET':
-#         resp = requests.get(f'http://localhost:8501/streamlit')
+SITE_NAME = "http://localhost:8501/"
 
-#         excluded_headers = ['content-encoding',
-#                             'content-length', 'transfer-encoding', 'connection']
-#         headers = [(name, value) for (name, value) in resp.raw.headers.items(
-#         ) if name.lower() not in excluded_headers]
-#         response = Response(resp.content, resp.status_code, headers)
-#     return response
 
+@app.route('/streamlit', methods=['GET'])
+def streamlit():
+    print('streamlit')
+
+    if not verify_access(session):
+        return redirect(url_for('index'))
+
+    if request.method == 'GET':
+        resp = requests.get(f'http://localhost:8501')
+        excluded_headers = ['content-encoding',
+                            'content-length', 'transfer-encoding', 'connection']
+        headers = [(name, value) for (name, value) in resp.raw.headers.items(
+        ) if name.lower() not in excluded_headers]
+        # resp.content = resp.content.replace('/static/','/cassiano/')
+        print("------------", type(resp.content))
+        content = resp.content.decode('utf-8')
+
+        content = content.replace('/static/', '/streamlit/static/')
+        content = content.replace('/healthz/', '/streamlit/healthz/')
+        content = content.replace(
+            'ws://localhost:5000/streamlit/stream', 'ws://localhost:8501/streamlit/stream')
+
+        # ws://localhost:5000/streamlit/stream
+        print(content)
+
+        response = Response(content.encode('utf-8'), resp.status_code, headers)
+    return response
+
+
+@app.route('/streamlit/<path:path>', methods=['GET'])
+def proxy(path):
+    print("inside proxy")
+    print(path)
+    URL = f'{SITE_NAME}{path}'
+    print(URL)
+    if request.method == 'GET':
+        resp = requests.get(URL)
+        excluded_headers = ['content-encoding',
+                            'content-length', 'transfer-encoding', 'connection']
+        headers = [(name, value) for (name, value) in resp.raw.headers.items(
+        ) if name.lower() not in excluded_headers]
+
+        response = Response(resp.content, resp.status_code, headers)
+    return response
 
 # @app.route('/<path:path>', methods=['GET', 'POST', 'DELETE'])
 # def proxy2(path):

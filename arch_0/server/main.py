@@ -29,7 +29,8 @@ def index():
         return render_template('index.html')
 
     if 'username' in session:
-        return 'You are logged in as ' + session['username']
+        return render_template('dashboard.html')
+        # return 'You are logged in as ' + session['username']
 
     return render_template('index.html')
 
@@ -50,7 +51,9 @@ def login():
         if bcrypt.checkpw(request.form['pass'].encode('utf-8'), login_user['password']):
             session['username'] = request.form['username']
             session['secret'] = APP_SECRET
-            return redirect(url_for('index'))
+            # return redirect('/streamlit')
+            return render_template('dashboard.html')
+            # return redirect(url_for('index'))
 
     return 'Invalid username/password combination'
 
@@ -78,7 +81,8 @@ def register():
 def logout():
     session['username'] = ''
     session['secret'] = ''
-    return 'logout'
+    # return 'logout'
+    return redirect(url_for('index'))
 
 
 @app.route('/app', methods=['POST', 'GET'])

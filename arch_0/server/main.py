@@ -7,7 +7,7 @@ import os
 
 DOCKER = os.getenv('DOCKER')
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/content')
 
 MONGO_USER = "root"
 MONGO_PASSWORD = "password"

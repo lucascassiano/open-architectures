@@ -16,6 +16,9 @@ if (DOCKER) {
     proxy.register('localhost/streamlit/health*', 'http://streamlit-app:8501/healthz');
     proxy.register('localhost/streamlit/stream', 'http://streamlit-app:8501/stream');
     proxy.register('localhost/static', 'http://streamlit-app:8501/static');
+
+    //vue.js
+    proxy.register('localhost/app', 'http://vue-app:8080');
 }
 else {
 
@@ -24,5 +27,8 @@ else {
     proxy.register('localhost/streamlit/static', 'http://localhost:8501/static');
     proxy.register('localhost/streamlit/healthz', 'http://localhost:8501/healthz');
     proxy.register('localhost/streamlit/stream', 'http://localhost:8501/stream');
+
+    //vue.js
+    proxy.register('localhost/app', 'http://localhost:8080');
 }
 

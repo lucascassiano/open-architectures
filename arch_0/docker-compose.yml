@@ -1,0 +1,56 @@
+version: "3.8"
+services:
+  reverse-proxy:
+    build: ./reverse-proxy
+    ports:
+      - "80:80"
+    links:
+      - server
+      - streamlit-app
+      # - mongo
+      # - vue-app
+    environment:
+      - DOCKER=true
+
+  # Main database
+  mongo:
+    image: mongo
+    restart: always
+    # volumes:
+    #   - "~/mongo/data:/data/db" #persistent database
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password #!!CHANGE THIS
+    ports:
+      - "27017:27017"
+
+  # Main REST Server, also has static home webpage
+  server:
+    build: ./server
+    environment:
+      - DOCKER=true
+    ports:
+      - "5000:5000"
+    links:
+      - streamlit-app
+      - mongo
+    volumes:
+      - "./server:/usr/src/app/" #persistent database
+      # - vue-app
+
+    restart: always
+
+  # DataViz app
+  streamlit-app:
+    build: ./streamlit-app
+    ports:
+      - "8501:8501" #enable this to access streamlit at http://localhost:8501
+    volumes:
+      - "./streamlit-app:/usr/src/app/"
+    command: "streamlit run main.py"
+
+  # Main UI app
+  vue-app:
+    build: ./vue-app
+    ports:
+      - "8080:8080"

@@ -1,0 +1,13 @@
+flask
+requests
+pymongo
+bcrypt
+dynaconf
+# urlparse
+
+#data
+pandas
+numpy
+
+#server
+# websockets

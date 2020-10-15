@@ -1,13 +1,13 @@
-# a little overkill but need it to install dot cli for dtreeviz
-FROM ubuntu:20.04
+# # a little overkill but need it to install dot cli for dtreeviz
+# FROM ubuntu:20.04
 
-# ubuntu installing - python, pip, graphviz, nano, libpq (for psycopg2)
-RUN apt-get update &&\
-    apt-get install python3.7 -y &&\
-    apt-get install python3-pip -y &&\
-    apt-get install graphviz -y
+# # ubuntu installing - python, pip, graphviz, nano, libpq (for psycopg2)
+# RUN apt-get update &&\
+#     apt-get install python3.7 -y &&\
+#     apt-get install python3-pip -y &&\
+#     apt-get install graphviz -y
 
-# FROM python:3.6-slim
+FROM python:3.6
 
 WORKDIR /usr/src/app
 
@@ -32,24 +32,24 @@ WORKDIR /usr/src/app
 #     pip3 install pandas
 
 COPY requirements.txt ./
-
 RUN pip install --no-cache-dir -r requirements.txt
-# RUN pip install -r requirements.txt
 
 COPY . .
 
-# streamlit-specific commands for config
+
+# --------------- Configure Streamlit ---------------
+RUN mkdir -p /root/.streamlit
+COPY ./.streamlit/config.toml /root/.streamlit
+# RUN bash -c 'echo -e "\
+# 	[server]\n\
+#     enableXsrfProtection = false\n\
+# 	enableCORS = false\n\
+# 	" > /root/.streamlit/config.toml'
+
+
+# --------------- Export envirennement variable ---------------
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
-RUN mkdir -p /root/.streamlit
-RUN bash -c 'echo -e "\
-[general]\n\
-email = \"\"\n\
-" > /root/.streamlit/credentials.toml'
-
-RUN bash -c 'echo -e "\
-[server]\n\
-enableCORS = false\n\
-" > /root/.streamlit/config.toml'
+ENV GIT_PYTHON_REFRESH=quiet
 
 CMD [ "streamlit run", "./main.py" ]

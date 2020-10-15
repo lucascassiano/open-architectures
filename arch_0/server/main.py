@@ -107,17 +107,11 @@ def streamlit():
                             'content-length', 'transfer-encoding', 'connection']
         headers = [(name, value) for (name, value) in resp.raw.headers.items(
         ) if name.lower() not in excluded_headers]
-        # resp.content = resp.content.replace('/static/','/cassiano/')
-        print("------------", type(resp.content))
+
         content = resp.content.decode('utf-8')
 
         content = content.replace('/static/', '/streamlit/static/')
         content = content.replace('/healthz/', '/streamlit/healthz/')
-        content = content.replace(
-            'ws://localhost:5000/streamlit/stream', 'ws://localhost:8501/streamlit/stream')
-
-        # ws://localhost:5000/streamlit/stream
-        print(content)
 
         response = Response(content.encode('utf-8'), resp.status_code, headers)
         return response
